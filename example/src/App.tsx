@@ -12,7 +12,6 @@ import type { SmsData } from '../../lib/typescript/commonjs/src/NativeSmsModule'
 
 export default function App() {
   const [result, setResult] = useState<SmsData[]>([]);
-  console.log('result', result);
   const [permissionStatusReadSMS, requestPermissionsReadSMS] = usePermissions(
     'android.permission.READ_SMS'
   );
@@ -21,16 +20,27 @@ export default function App() {
 
   useEffect(() => {
     requestPermissionsReadSMS();
-    requestPermissionsReceiveSMS();
   }, []);
 
   useEffect(() => {
     let subscription: any;
-    if (
-      permissionStatusReadSMS === true &&
-      permissionStatusReceiveSMS === true
-    ) {
+    if (permissionStatusReceiveSMS === true) {
       RTNSmsModule.startSmsListener();
+      const eventEmitter = new NativeEventEmitter(RTNSmsModule);
+      subscription = eventEmitter.addListener('onSms', (newData) => {
+        console.log('New SMS startSmsListenerstartSmsListener', newData);
+        setResult((prev) => [newData, ...prev]);
+      });
+    }
+    return () => {
+      RTNSmsModule.stopSmsListener();
+      subscription?.remove?.();
+    };
+  }, [permissionStatusReceiveSMS]);
+
+  useEffect(() => {
+    if (permissionStatusReadSMS === true) {
+      requestPermissionsReceiveSMS();
       const filters = {
         // sender: '+911234567890',
         // keyword: 'Code',
@@ -45,17 +55,8 @@ export default function App() {
           setResult(messages);
         })
         .catch((error) => console.error('Error getting messages', error));
-      const eventEmitter = new NativeEventEmitter(RTNSmsModule);
-      subscription = eventEmitter.addListener('onSms', (newData) => {
-        console.log('New SMS startSmsListenerstartSmsListener', newData);
-        setResult((prev) => [newData, ...prev]);
-      });
     }
-    return () => {
-      RTNSmsModule.stopSmsListener();
-      subscription?.remove?.();
-    };
-  }, [permissionStatusReceiveSMS, permissionStatusReadSMS]);
+  }, [permissionStatusReadSMS]);
 
   return (
     <View style={styles.container}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   type Permission,
   PermissionsAndroid,
@@ -12,20 +12,17 @@ const usePermissions = (permission: Permission) => {
 
   useEffect(() => {
     const checkPermissions = async () => {
-      console.log('checking');
       const result: PermissionType = await PermissionsAndroid.check(permission);
-      console.log('result', result);
       setStatus(result);
     };
 
     checkPermissions();
   }, [permission]);
 
-  const requestPermissions = async () => {
-    const result: PermissionType =
-      (await PermissionsAndroid.request(permission)) === 'granted';
-    setStatus(result);
-  };
+  const requestPermissions = useCallback(async () => {
+    const result: PermissionType = await PermissionsAndroid.request(permission);
+    setStatus(result === 'granted');
+  }, [permission]);
 
   return [status, requestPermissions] as const;
 };
