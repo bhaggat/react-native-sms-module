@@ -7,7 +7,7 @@ import {
   FlatList,
 } from 'react-native';
 import usePermissions from './hooks/usePermissions';
-import RTNSmsModule from 'react-native-sms-module';
+import SmsModule from 'react-native-sms-module';
 import type { SmsData } from '../../lib/typescript/commonjs/src/NativeSmsModule';
 
 export default function App() {
@@ -20,20 +20,20 @@ export default function App() {
 
   useEffect(() => {
     requestPermissionsReadSMS();
-  }, []);
+  }, [requestPermissionsReadSMS]);
 
   useEffect(() => {
     let subscription: any;
     if (permissionStatusReceiveSMS === true) {
-      RTNSmsModule.startSmsListener();
-      const eventEmitter = new NativeEventEmitter(RTNSmsModule);
+      SmsModule.startSmsListener();
+      const eventEmitter = new NativeEventEmitter(SmsModule);
       subscription = eventEmitter.addListener('onSms', (newData) => {
         console.log('New SMS startSmsListenerstartSmsListener', newData);
         setResult((prev) => [newData, ...prev]);
       });
     }
     return () => {
-      RTNSmsModule.stopSmsListener();
+      SmsModule.stopSmsListener();
       subscription?.remove?.();
     };
   }, [permissionStatusReceiveSMS]);
@@ -50,13 +50,13 @@ export default function App() {
         // unReadOnly: true,
       };
 
-      RTNSmsModule.getSMSList(0, 10, filters)
+      SmsModule.getSMSList(0, 10, filters)
         .then((messages) => {
           setResult(messages);
         })
         .catch((error) => console.error('Error getting messages', error));
     }
-  }, [permissionStatusReadSMS]);
+  }, [requestPermissionsReceiveSMS, permissionStatusReadSMS]);
 
   return (
     <View style={styles.container}>

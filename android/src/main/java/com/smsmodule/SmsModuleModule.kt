@@ -111,7 +111,6 @@ class SmsModuleModule(reactContext: ReactApplicationContext) :
                 if (intent?.action == "android.provider.Telephony.SMS_RECEIVED") {
                     val bundle = intent.extras
                     if (bundle != null) {
-                        // Safely retrieve the PDUs
                         val pdus = bundle.get("pdus") as? Array<*>
                         pdus?.forEach { pdu ->
                             try {
@@ -119,11 +118,8 @@ class SmsModuleModule(reactContext: ReactApplicationContext) :
                                 val sender = message.originatingAddress
                                 val messageBody = message.messageBody
                                 val timestamp = message.timestampMillis
-
-                                // Generate a custom message ID using sender and timestamp
                                 val messageId = "$sender-$timestamp"
 
-                                // Create params map according to the SmsData type
                                 val params = Arguments.createMap().apply {
                                     putString("id", messageId)
                                     putString("sender", sender ?: "Unknown")
@@ -131,7 +127,6 @@ class SmsModuleModule(reactContext: ReactApplicationContext) :
                                     putDouble("timestamp", timestamp.toDouble())
                                 }
 
-                                // Send event with params
                                 sendEvent("onSms", params)
                             } catch (e: Exception) {
                                 Log.e("SmsModule", "Error parsing SMS PDU: ${e.message}", e)
