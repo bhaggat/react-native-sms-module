@@ -54,15 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TURBO_CACHE_DIR: .turbo/android
-      ANDROID_HOME: ${{ runner.temp }}/android-sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Cache TurboRepo for Android
         uses: actions/cache@v3
@@ -100,9 +97,10 @@ jobs:
           echo "export ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
 
-      - name: Accept Android Licenses
+      - name: Finalize Android SDK
         if: env.turbo_cache_hit != 1
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
+        run: |
+          /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
 
       - name: Cache Gradle
         if: env.turbo_cache_hit != 1
@@ -121,4 +119,5 @@ jobs:
       - name: Build Android Example
         env:
           JAVA_OPTS: '-XX:MaxHeapSize=6g'
-        run: yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}"
+        run: |
+          yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}"
