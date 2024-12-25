@@ -6,7 +6,7 @@ export type SmsData = {
   body: string;
   timestamp: number;
 };
-interface GetSMSListFilters {
+export interface GetSMSListFilters {
   sender?: string;
   keyword?: string;
   dateFrom?: number;

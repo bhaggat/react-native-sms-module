@@ -1,17 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
-  NativeEventEmitter,
   FlatList,
+  TouchableOpacity,
 } from 'react-native';
 import usePermissions from './hooks/usePermissions';
-import SmsModule from 'react-native-sms-module';
-import type { SmsData } from '../../lib/typescript/commonjs/src/NativeSmsModule';
+import {
+  startSmsListener,
+  stopSmsListener,
+  getSMSList,
+  type SmsData,
+  type GetSMSListFilters,
+} from 'react-native-sms-module';
 
 export default function App() {
   const [result, setResult] = useState<SmsData[]>([]);
+  const [isListening, setIsListening] = useState(false);
   const [permissionStatusReadSMS, requestPermissionsReadSMS] = usePermissions(
     'android.permission.READ_SMS'
   );
@@ -22,26 +28,24 @@ export default function App() {
     requestPermissionsReadSMS();
   }, [requestPermissionsReadSMS]);
 
-  useEffect(() => {
-    let subscription: any;
+  const startListerning = useCallback(() => {
     if (permissionStatusReceiveSMS === true) {
-      SmsModule.startSmsListener();
-      const eventEmitter = new NativeEventEmitter(SmsModule);
-      subscription = eventEmitter.addListener('onSms', (newData) => {
+      setIsListening(true);
+      startSmsListener((newData: SmsData) => {
         console.log('New SMS startSmsListenerstartSmsListener', newData);
         setResult((prev) => [newData, ...prev]);
       });
     }
-    return () => {
-      SmsModule.stopSmsListener();
-      subscription?.remove?.();
-    };
   }, [permissionStatusReceiveSMS]);
+
+  const stopListerning = useCallback(() => {
+    stopSmsListener();
+  }, []);
 
   useEffect(() => {
     if (permissionStatusReadSMS === true) {
       requestPermissionsReceiveSMS();
-      const filters = {
+      const filters: GetSMSListFilters = {
         // sender: '+911234567890',
         // keyword: 'Code',
         // dateFrom: new Date().getTime() - 5000000000,
@@ -50,8 +54,8 @@ export default function App() {
         // unReadOnly: true,
       };
 
-      SmsModule.getSMSList(0, 10, filters)
-        .then((messages) => {
+      getSMSList(0, 10, filters)
+        .then((messages: SmsData[]) => {
           setResult(messages);
         })
         .catch((error) => console.error('Error getting messages', error));
@@ -61,6 +65,13 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Result: {result?.length}</Text>
+      <TouchableOpacity
+        onPress={isListening ? stopListerning : startListerning}
+      >
+        <Text style={styles.stopListner}>
+          {isListening ? 'Stop' : 'Start'} Listen
+        </Text>
+      </TouchableOpacity>
       <FlatList
         data={result}
         style={styles.smsesContainer}
@@ -123,5 +134,15 @@ const styles = StyleSheet.create({
   smsDate: {
     fontSize: 12,
     color: 'gray',
+  },
+  stopListner: {
+    color: 'white',
+    fontSize: 18,
+    marginBottom: 8,
+    marginTop: 16,
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 8,
+    textAlign: 'center',
   },
 });
