@@ -54,14 +54,17 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TURBO_CACHE_DIR: .turbo/android
+      ANDROID_HOME: ${{ runner.temp }}/android-sdk
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup
-        uses: ./.github/actions/setup
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-      - name: Cache turborepo for Android
+      - name: Cache TurboRepo for Android
         uses: actions/cache@v3
         with:
           path: ${{ env.TURBO_CACHE_DIR }}
@@ -69,10 +72,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turborepo-android-
 
-      - name: Check turborepo cache for Android
+      - name: Check TurboRepo Cache for Android
         run: |
-          TURBO_CACHE_STATUS=$(node -p "($(yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}" --dry=json)).tasks.find(t => t.task === 'build:android').cache.status")
-
+          TURBO_CACHE_STATUS=$(node -p "($(yarn turbo run build:android --cache-dir='${{ env.TURBO_CACHE_DIR }}' --dry=json)).tasks.find(t => t.task === 'build:android').cache.status")
           if [[ $TURBO_CACHE_STATUS == "HIT" ]]; then
             echo "turbo_cache_hit=1" >> $GITHUB_ENV
           fi
@@ -84,10 +86,23 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Finalize Android SDK
+      - name: Install Android SDK
         if: env.turbo_cache_hit != 1
         run: |
-          /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jdk
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          curl -sSL "https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip" -o cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          rm cmdline-tools.zip
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH
+          echo "export ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+
+      - name: Accept Android Licenses
+        if: env.turbo_cache_hit != 1
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
 
       - name: Cache Gradle
         if: env.turbo_cache_hit != 1
@@ -100,8 +115,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build example for Android
+      - name: Set gradlew permissions
+        run: chmod +x example/android/gradlew
+
+      - name: Build Android Example
         env:
           JAVA_OPTS: '-XX:MaxHeapSize=6g'
-        run: |
-          yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}"
+        run: yarn turbo run build:android --cache-dir="${{ env.TURBO_CACHE_DIR }}"

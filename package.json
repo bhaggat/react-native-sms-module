@@ -64,7 +64,7 @@
   "bugs": {
     "url": "https://github.com/bhaggat/react-native-sms-module/issues"
   },
-  "homepage": "https://github.com/bhaggat/react-native-sms-module#readme",
+  "homepage": "https://www.npmjs.com/package/react-native-sms-module",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
