@@ -57,14 +57,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bhaggat/react-native-sms-module"
+    "url": "git+https://github.com/bhaggat/react-native-sms-module.git"
   },
   "author": "Dhruv <dhruvbhagat98@gmail.com> (https://github.com/bhaggat)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bhaggat/react-native-sms-module/issues"
   },
-  "homepage": "https://www.npmjs.com/package/react-native-sms-module",
+  "homepage": "https://github.com/bhaggat/react-native-sms-module#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
