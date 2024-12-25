@@ -1,11 +1,11 @@
-# React Native SMS Module
+# React Native SMS Module 🚀
 
-A React Native library to interact with SMS messages on Android. This library allows you to:
+Easily interact with SMS messages on Android using this React Native library, built for the **latest React Native architecture**! With this module, you can:
 
-- Fetch SMS messages from the device inbox with filtering options.
-- Listen for incoming SMS messages in real-time.
+- ✅ Fetch SMS messages from the device inbox with advanced filtering options.
+- ✅ Listen for incoming SMS messages in real time.
 
-## Installation
+## Installation 🔧
 
 Install the library using npm or yarn:
 
@@ -19,9 +19,11 @@ or
 yarn add react-native-sms-module
 ```
 
-No linking needed as library is made for new react native versions.
+No manual linking is required as this library is designed for modern React Native versions.
 
-## Permissions
+---
+
+## Permissions 🚨
 
 Add the following permissions to your Android `AndroidManifest.xml` file:
 
@@ -30,33 +32,35 @@ Add the following permissions to your Android `AndroidManifest.xml` file:
 <uses-permission android:name="android.permission.READ_SMS" />
 ```
 
-### Notes:
+### Notes ⚠️
 
-- Make sure to request permissions at runtime before using the library methods.
+- Request permissions at runtime before using the library's methods.
+- Permission usage details:
+  - `android.permission.RECEIVE_SMS` → For `startSmsListener()`.
+  - `android.permission.READ_SMS` → For `getSMSList()`.
 
-```xml
-android.permission.RECEIVE_SMS: For `startSmsListener` method
-android.permission.READ_SMS: for `getSMSList` method
-```
+---
 
-## API
+## API Reference 📘
 
-### `startSmsListener()`
+### 1. **`startSmsListener(callback)`**
 
-This method starts listening for incoming SMS messages. It triggers the provided callback as soon as the user receives a new message.
+Start listening for incoming SMS messages. The provided callback is triggered when a new SMS is received.
 
 **Usage:**
 
 ```typescript
 startSmsListener((newData: SmsData) => {
-  console.log('New SMS received', newData);
-  // Do something with the new SMS data
+  console.log('New SMS received:', newData);
+  // Handle the SMS data here
 });
 ```
 
-### `stopSmsListener()`
+---
 
-This method stops the SMS listener and unsubscribes from receiving new SMS events.
+### 2. **`stopSmsListener()`**
+
+Stop listening for incoming SMS messages.
 
 **Usage:**
 
@@ -64,45 +68,44 @@ This method stops the SMS listener and unsubscribes from receiving new SMS event
 stopSmsListener();
 ```
 
-### Fetch SMS Messages
+---
 
-To fetch SMS messages from the device inbox,You can filter messages by sender, keyword, date range, or message status (read/unread):
+### 3. **`getSMSList(offset, limit, filters)`**
+
+Fetch SMS messages from the device inbox with optional filtering by sender, keyword, date range, or status (read/unread).
 
 **Usage:**
 
 ```typescript
 const filters = {
   sender: '+911234567890', // Filter by sender (optional)
-  keyword: 'Code', // Filter by keyword in body (optional)
-  dateFrom: 1633046400000, // Start date in milliseconds (optional)
-  dateTo: 1633132800000, // End date in milliseconds (optional)
+  keyword: 'Code', // Filter by keyword (optional)
+  dateFrom: 1633046400000, // Start date in milliseconds(optional)
+  dateTo: 1633132800000, // End date in milliseconds(optional)
   readOnly: true, // Fetch only read messages (optional)
   unReadOnly: true, // Fetch only unread messages (optional)
 };
 
 getSMSList(0, 10, filters)
-  .then((messages) => {
-    console.log('Fetched SMS messages:', messages);
-  })
-  .catch((error) => {
-    console.error('Error fetching messages:', error);
-  });
+  .then((messages) => console.log('Fetched messages:', messages))
+  .catch((error) => console.error('Error:', error));
 ```
 
-## Example Usage
+---
 
-Here’s an example of how to use the updated `react-native-sms-module`:
+## Example Usage 📚
+
+Here’s an example of how to use `react-native-sms-module`:
 
 ```tsx
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Text,
   View,
-  StyleSheet,
+  Text,
   FlatList,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
-import usePermissions from './hooks/usePermissions';
 import {
   startSmsListener,
   stopSmsListener,
@@ -111,115 +114,115 @@ import {
   type GetSMSListFilters,
 } from 'react-native-sms-module';
 
-export default function App() {
-  const [result, setResult] = useState<SmsData[]>([]);
+const App = () => {
+  const [messages, setMessages] = useState<SmsData[]>([]);
   const [isListening, setIsListening] = useState(false);
-  const [permissionStatusReadSMS, requestPermissionsReadSMS] = usePermissions(
-    'android.permission.READ_SMS'
-  );
-  const [permissionStatusReceiveSMS, requestPermissionsReceiveSMS] =
-    usePermissions('android.permission.RECEIVE_SMS');
 
-  useEffect(() => {
-    requestPermissionsReadSMS();
-  }, [requestPermissionsReadSMS]);
+  const startListening = useCallback(() => {
+    setIsListening(true);
+    startSmsListener((newData: SmsData) => {
+      setMessages((prev) => [newData, ...prev]);
+    });
+  }, []);
 
-  const startListerning = useCallback(() => {
-    if (permissionStatusReceiveSMS === true) {
-      setIsListening(true);
-      startSmsListener((newData: SmsData) => {
-        console.log('New SMS received', newData);
-        setResult((prev) => [newData, ...prev]);
-      });
-    }
-  }, [permissionStatusReceiveSMS]);
-
-  const stopListerning = useCallback(() => {
+  const stopListening = useCallback(() => {
     stopSmsListener();
+    setIsListening(false);
   }, []);
 
   useEffect(() => {
-    if (permissionStatusReadSMS === true) {
-      requestPermissionsReceiveSMS();
-      const filters: GetSMSListFilters = {
-        // sender: '+911234567890',
-        // keyword: 'Code',
-        // dateFrom: new Date().getTime() - 5000000000,
-        // dateTo: new Date().getTime(),
-        // readOnly: false,
-        // unReadOnly: true,
-      };
-
-      getSMSList(0, 10, filters)
-        .then((messages: SmsData[]) => {
-          setResult(messages);
-        })
-        .catch((error: any) => console.error('Error getting messages', error));
-    }
-  }, [requestPermissionsReceiveSMS, permissionStatusReadSMS]);
+    const filters: GetSMSListFilters = {
+      // sender: '+911234567890',
+      // keyword: 'Code',
+      // dateFrom: new Date().getTime() - 5000000000,
+      // dateTo: new Date().getTime(),
+      // readOnly: false,
+      // unReadOnly: true,
+    };
+    getSMSList(0, 10, filters)
+      .then((msgs) => setMessages(msgs))
+      .catch((error) => console.error(error));
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Result: {result?.length}</Text>
-      <TouchableOpacity
-        onPress={isListening ? stopListerning : startListerning}
-      >
-        <Text style={styles.stopListner}>
-          {isListening ? 'Stop' : 'Start'} Listen
+      <Text style={styles.title}>Messages: {messages.length}</Text>
+      <TouchableOpacity onPress={isListening ? stopListening : startListening}>
+        <Text style={styles.button}>
+          {isListening ? 'Stop' : 'Start'} Listener
         </Text>
       </TouchableOpacity>
       <FlatList
-        data={result}
-        style={styles.smsesContainer}
+        data={messages}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.contentContainerStyle}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.smsContainer}>
-              <Text style={styles.smsText}>{item.sender}</Text>
-              <Text style={styles.body}>{item.body}</Text>
-              <Text style={styles.smsDate}>
-                {new Date(+item.timestamp).toLocaleString()}
-              </Text>
-            </View>
-          );
-        }}
+        renderItem={({ item }) => (
+          <View style={styles.message}>
+            <Text>
+              {item.sender}: {item.body}
+            </Text>
+            <Text>{new Date(item.timestamp).toLocaleString()}</Text>
+          </View>
+        )}
       />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 20 },
+  title: { fontSize: 18, fontWeight: 'bold' },
+  button: { fontSize: 16, color: 'blue', marginVertical: 10 },
+  message: { marginBottom: 10 },
+});
+
+export default App;
 ```
 
-## Types
+---
+
+## Types 📂
 
 ### `SmsData`
 
-Represents a single SMS message.
+Structure of an SMS message:
 
-```ts
+```typescript
 export type SmsData = {
-  id: string; // Unique ID for the SMS message
+  id: string; // Unique message ID
   sender: string; // Sender's phone number
-  body: string; // Message content
-  timestamp: number; // Timestamp of the message
+  body: string; // Message text
+  timestamp: number; // Timestamp in milliseconds
 };
 ```
 
 ### `GetSMSListFilters`
 
-Represents the filters that can be applied when fetching SMS messages.
+Filters for fetching SMS messages:
 
-```ts
+```typescript
 export type GetSMSListFilters = {
-  sender?: string; // Filter by sender's phone number
-  keyword?: string; // Filter by keyword in the message body
-  dateFrom?: number; // Filter messages received from this date (timestamp)
-  dateTo?: number; // Filter messages received until this date (timestamp)
-  unReadOnly?: boolean; // Filter unread messages only
-  readOnly?: boolean; // Filter read messages only
+  sender?: string; // Filter by sender
+  keyword?: string; // Filter by keyword in the body
+  dateFrom?: number; // Start date (timestamp)
+  dateTo?: number; // End date (timestamp)
+  readOnly?: boolean; // Only read messages
+  unReadOnly?: boolean; // Only unread messages
 };
 ```
 
-## License
+---
 
-MIT
+## Contribution 🙌
+
+We welcome contributions!  
+To contribute:
+
+1. Fork the repository.
+2. Create a new branch and make your changes.
+3. Submit a pull request.
+
+---
+
+## License 📜
+
+This project is licensed under the MIT License.

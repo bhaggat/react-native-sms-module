@@ -4,7 +4,12 @@
   "keywords": [
     "react-native",
     "sms",
-    "android"
+    "text-message",
+    "android",
+    "react-native-sms-module",
+    "sms-listener",
+    "react-native-sms",
+    "real-time-sms"
   ],
   "description": "A React Native module to access SMS messages on Android.",
   "source": "./src/index.tsx",
