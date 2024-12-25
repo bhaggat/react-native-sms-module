@@ -1,5 +1,8 @@
 # React Native SMS Module 🚀
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/bhaggat/react-native-sms-module)
+[![npm version](https://img.shields.io/npm/v/react-native-sms-module)](https://www.npmjs.com/package/react-native-sms-module)
+
 Easily interact with SMS messages on Android using this React Native library, built for the **latest React Native architecture**! With this module, you can:
 
 - ✅ Fetch SMS messages from the device inbox with advanced filtering options.
