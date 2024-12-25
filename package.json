@@ -1,7 +1,12 @@
 {
   "name": "react-native-sms-module",
   "version": "0.1.0",
-  "description": "Read SMS from android",
+  "keywords": [
+    "react-native",
+    "sms",
+    "android"
+  ],
+  "description": "A React Native module to access SMS messages on Android.",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
@@ -45,11 +50,6 @@
     "prepare": "bob build",
     "release": "release-it"
   },
-  "keywords": [
-    "react-native",
-    "ios",
-    "android"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bhaggat/react-native-sms-module.git"
