@@ -1829,11 +1829,11 @@ __metadata:
   linkType: hard
 
 "@evilmartians/lefthook@npm:^1.5.0":
-  version: 1.10.0
-  resolution: "@evilmartians/lefthook@npm:1.10.0"
+  version: 1.10.1
+  resolution: "@evilmartians/lefthook@npm:1.10.1"
   bin:
     lefthook: bin/index.js
-  checksum: 05d916568243b91fccd801f793abc76c6c2defa6f0add1f75e842c55e319e70b58c2862eb13100c44243aa72484cf0d3797aaa27b2e3a8a980a61d1c104cca5d
+  checksum: 6d64b323bc760f6fe04e9325f616632a4a67bf3b0860a0da576ea7f72d0eb93060c8178324a0a61a68c5a6cc9b03248d8dbacb46f55bf753fe0c4d6cce5c76b8
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64 | cpu=ia32)
   languageName: node
   linkType: hard
@@ -12371,9 +12371,9 @@ __metadata:
   linkType: hard
 
 "type-fest@npm:^4.18.2, type-fest@npm:^4.21.0, type-fest@npm:^4.6.0, type-fest@npm:^4.7.1":
-  version: 4.30.2
-  resolution: "type-fest@npm:4.30.2"
-  checksum: 861f7ae761fa11194743318a486c04b369f6f39060c8c24a099880478efa5c7562b72ad88c38fb7d7dc57111fb378b8922fceddaff363cfc002c6005a99d6bb6
+  version: 4.31.0
+  resolution: "type-fest@npm:4.31.0"
+  checksum: 2e054436aaf9a9abfd33108d21781ec840f48f1813a58a166aa68bbe31804d06ba45927eb02106af0e7da92c4dc4d66309cf76d3a28cc1f6981e826381771f1f
   languageName: node
   linkType: hard
 

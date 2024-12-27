@@ -9,7 +9,8 @@
     "react-native-sms-module",
     "sms-listener",
     "react-native-sms",
-    "real-time-sms"
+    "real-time-sms",
+    "typescript"
   ],
   "description": "A React Native module to read & listen new SMS messages on Android.",
   "source": "./src/index.tsx",
@@ -31,11 +32,9 @@
     "src",
     "lib",
     "android",
-    "ios",
     "cpp",
     "*.podspec",
     "react-native.config.js",
-    "!ios/build",
     "!android/build",
     "!android/gradle",
     "!android/gradlew",
@@ -189,7 +188,6 @@
     "type": "modules",
     "jsSrcsDir": "src",
     "outputDir": {
-      "ios": "ios/generated",
       "android": "android/generated"
     },
     "android": {
